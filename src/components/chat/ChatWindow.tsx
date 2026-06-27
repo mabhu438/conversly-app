@@ -79,8 +79,11 @@ export function ChatWindow({ threadId }: { threadId: string }) {
       await supabase.from("chat_threads").update({ title }).eq("id", threadId);
       queryClient.invalidateQueries({ queryKey: ["threads"] });
     } else {
-      // Touch updated_at so it floats to top
-      await supabase.from("chat_threads").update({ title: undefined as never, updated_at: new Date().toISOString() as never }).eq("id", threadId);
+      // Touch updated_at so it floats to the top of the sidebar
+      await supabase
+        .from("chat_threads")
+        .update({ updated_at: new Date().toISOString() })
+        .eq("id", threadId);
       queryClient.invalidateQueries({ queryKey: ["threads"] });
     }
 
