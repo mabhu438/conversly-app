@@ -77,14 +77,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Sales Copilot — AI Sales Chatbot" },
+      { name: "description", content: "Modern AI sales chatbot to answer questions about plans, pricing, and demos in real time." },
+      { property: "og:title", content: "Sales Copilot — AI Sales Chatbot" },
+      { property: "og:description", content: "Chat with an AI sales assistant about plans, pricing, and demos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Sales Copilot — AI Sales Chatbot" },
+      { name: "twitter:description", content: "Chat with an AI sales assistant about plans, pricing, and demos." },
     ],
     links: [
       {
