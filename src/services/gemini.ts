@@ -1,8 +1,8 @@
 // services/gemini.ts
 //
 // Chat service — sends user messages to the backend AI server.
-// Backend URL is configurable via VITE_CHAT_API_URL (defaults to
-// http://localhost:5000/chat for local development).
+// Backend URL is configurable via VITE_CHAT_API_URL (defaults to the
+// deployed Render backend).
 
 export interface ChatTurn {
   role: "user" | "assistant";
@@ -11,7 +11,7 @@ export interface ChatTurn {
 
 const CHAT_API_URL =
   (import.meta.env.VITE_CHAT_API_URL as string | undefined) ??
-  "http://localhost:5000/chat";
+  "https://ai-sales-chatbot-backend.onrender.com/chat";
 
 /**
  * Send a message to the backend AI server.
