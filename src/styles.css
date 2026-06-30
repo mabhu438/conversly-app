@@ -125,3 +125,11 @@
   40% { transform: translateY(-4px); opacity: 1; }
 }
 .typing-dot { animation: dot-bounce 1.2s infinite ease-in-out both; }
+
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.6); }
+  50% { box-shadow: 0 0 0 8px rgb(239 68 68 / 0); }
+}
+@utility animate-mic-pulse {
+  animation: mic-pulse 1.4s ease-out infinite;
+}
