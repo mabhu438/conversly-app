@@ -30,7 +30,7 @@ export function ChatWindow({ threadId }: { threadId: string }) {
   const lastSpokenIdRef = useRef<string | null>(null);
   const sendingRef = useRef(false);
 
-  const { voiceEnabled, rate, lang } = useVoiceSettings();
+  const { voiceEnabled, rate, lang, autoScroll, enterToSend } = useVoiceSettings();
   const tts = useSpeechSynthesis();
 
   // Speech-to-text — auto-send recognized speech
@@ -63,12 +63,13 @@ export function ChatWindow({ threadId }: { threadId: string }) {
     },
   });
 
-  // Auto-scroll
+  // Auto-scroll (respects user preference)
   useEffect(() => {
+    if (!autoScroll) return;
     const el = scrollRef.current;
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [messages, isTyping]);
+  }, [messages, isTyping, autoScroll]);
 
   // Auto-speak the newest assistant message (once per id)
   useEffect(() => {
@@ -215,6 +216,7 @@ export function ChatWindow({ threadId }: { threadId: string }) {
         onChange={setInput}
         onSend={() => handleSend()}
         disabled={isTyping}
+        enterToSend={enterToSend}
         micSupported={stt.supported}
         micStatus={stt.status}
         onMicToggle={stt.toggle}
