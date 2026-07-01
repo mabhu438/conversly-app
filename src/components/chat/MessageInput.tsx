@@ -8,6 +8,8 @@ interface Props {
   onChange: (v: string) => void;
   onSend: () => void;
   disabled?: boolean;
+  /** When false, Enter inserts a newline; sending requires the Send button. Defaults to true. */
+  enterToSend?: boolean;
 
   // Voice integration
   micSupported?: boolean;
@@ -24,6 +26,7 @@ export function MessageInput({
   onChange,
   onSend,
   disabled,
+  enterToSend = true,
   micSupported,
   micStatus = "idle",
   onMicToggle,
@@ -43,6 +46,7 @@ export function MessageInput({
   useEffect(() => { ref.current?.focus(); }, []);
 
   function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (!enterToSend) return; // let Enter insert a newline
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (!disabled && value.trim()) onSend();
