@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, MessageSquare, Trash2, LogOut, Sparkles, Loader2 } from "lucide-react";
+import { Plus, MessageSquare, Trash2, LogOut, Sparkles, Loader2, User, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -146,7 +146,17 @@ export function ThreadSidebar({ onNavigate }: { onNavigate?: () => void }) {
         )}
       </div>
 
-      <div className="border-t p-3">
+      <div className="border-t p-2 space-y-1">
+        <Button variant="ghost" asChild className="w-full justify-start text-muted-foreground hover:text-foreground">
+          <Link to="/profile" onClick={() => onNavigate?.()}>
+            <User className="mr-2 h-4 w-4" /> Profile
+          </Link>
+        </Button>
+        <Button variant="ghost" asChild className="w-full justify-start text-muted-foreground hover:text-foreground">
+          <Link to="/settings" onClick={() => onNavigate?.()}>
+            <Settings className="mr-2 h-4 w-4" /> Settings
+          </Link>
+        </Button>
         <Button
           variant="ghost"
           className="w-full justify-start text-muted-foreground hover:text-foreground"
