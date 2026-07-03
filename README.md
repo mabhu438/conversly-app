@@ -1,68 +1,101 @@
-# Sales Copilot — AI Sales Chatbot
+# Sales Copilot — AI Voice Chatbot
 
-A modern, fully responsive AI sales chatbot built with React, Vite, TanStack Start, Tailwind CSS v4, and Lovable Cloud (auth + database). Bot replies are currently mocked and ready to be swapped for the Google Gemini API without changing the UI.
+Production-ready AI chatbot with voice input/output, persistent conversation history, RBAC, and an admin dashboard. Built on TanStack Start, React 19, Tailwind v4, and Lovable Cloud (Supabase).
+
+**Live demo:** https://conversly-app.lovable.app
+**Backend (chat API):** https://ai-sales-chatbot-backend.onrender.com
+
+---
 
 ## Features
 
-- Clean, ChatGPT/Gemini-style chat UI (desktop, tablet, mobile)
-- Email/password and Google sign-in
-- Multiple persistent conversation threads (sidebar with new/delete)
-- User messages on the right, bot messages on the left with smooth bubble animations
-- Auto-scroll to latest message
-- Enter-to-send, disabled send button when input is empty
-- Typing indicator while the bot "thinks" (1–2s)
-- Per-user data isolation via row-level security
-- Drop-in Gemini integration point in `src/services/gemini.ts`
+- 💬 ChatGPT / Gemini-style chat UI (desktop, tablet, mobile)
+- 🎙️ Voice input via Web Speech API (SpeechRecognition)
+- 🔊 Voice output via SpeechSynthesis with voice/rate/pitch settings
+- 🧠 Conversation memory — full history sent per turn
+- 🗂️ Persistent multi-thread history with search, rename, delete
+- 👤 Email/password + Google OAuth authentication
+- 🛡️ RBAC (`admin` / `user`) with a protected admin dashboard
+- 📊 Admin analytics: users, messages, threads, recent activity
+- ♿ A11y-focused, keyboard-friendly, mobile-responsive
+- 🌓 Light/dark themes via CSS design tokens
 
-## Folder structure
+## Tech Stack
+
+| Layer     | Tech                                                        |
+| --------- | ----------------------------------------------------------- |
+| Framework | TanStack Start v1 + React 19 + Vite 7                       |
+| Styling   | Tailwind CSS v4 (CSS-first, design tokens in `styles.css`)  |
+| UI        | shadcn/ui + Radix primitives + lucide-react                 |
+| Data      | TanStack Query v5, TanStack Router (file-based)             |
+| Backend   | Lovable Cloud (Supabase) — Auth, Postgres, RLS              |
+| AI        | Google Gemini via external REST backend (Render)            |
+| Voice     | Web Speech API (browser-native STT + TTS)                   |
+| Deploy    | Frontend: Lovable / Cloudflare Workers · Backend: Render    |
+
+## Folder Structure
 
 ```
 src/
 ├── components/
-│   ├── chat/
-│   │   ├── ChatWindow.tsx       # Scrollable chat + input
-│   │   ├── MessageBubble.tsx    # User/assistant bubble
-│   │   ├── MessageInput.tsx     # Textarea + send button
-│   │   ├── ThreadSidebar.tsx    # Conversation list + sign out
-│   │   └── TypingIndicator.tsx  # Animated dots
-│   └── ui/                      # shadcn primitives
+│   ├── AppShell.tsx
+│   ├── chat/               # ChatWindow, MessageInput, ThreadSidebar, VoiceSettingsMenu, ...
+│   └── ui/                 # shadcn primitives
+├── contexts/               # VoiceSettingsContext
+├── hooks/                  # useSpeechRecognition, useSpeechSynthesis, useUserRole
+├── integrations/supabase/  # auto-generated clients (do not edit)
 ├── routes/
-│   ├── auth.tsx                 # Sign-in / sign-up page
-│   ├── index.tsx                # Redirects to /chat
-│   └── _authenticated/          # Auth-gated section
-│       ├── route.tsx            # Auth guard
-│       ├── chat.tsx             # Sidebar + outlet layout
-│       ├── chat.index.tsx       # Picks latest / creates thread
-│       └── chat.$threadId.tsx   # Active conversation
-├── services/
-│   └── gemini.ts                # Dummy Gemini service (replace later)
-└── styles.css                   # Design tokens (Tailwind v4)
+│   ├── __root.tsx          # app shell
+│   ├── index.tsx           # → /chat
+│   ├── auth.tsx            # sign in / sign up
+│   ├── api/health.ts       # GET /api/health
+│   └── _authenticated/     # gated subtree
+│       ├── route.tsx       # auth guard (managed)
+│       ├── chat.tsx        # sidebar layout
+│       ├── chat.index.tsx  # picks/creates thread
+│       ├── chat.$threadId.tsx
+│       ├── profile.tsx
+│       ├── settings.tsx
+│       └── admin.tsx       # admin-only dashboard
+├── services/gemini.ts      # POST chat backend
+└── styles.css              # design tokens
+supabase/migrations/        # SQL migrations (RLS, roles, tables)
+docs/                       # setup, deploy, API, architecture
 ```
 
-## Local setup
+## Local Setup
 
 ```bash
 bun install
 bun run dev
 ```
 
-The app runs at http://localhost:8080.
+App runs at http://localhost:8080. See **[docs/SETUP.md](docs/SETUP.md)** for the full guide.
 
-## Switching to the real Gemini API
+## Environment Variables
 
-`src/services/gemini.ts` exports `sendMessageToGemini(userMessage, history)`. The UI calls this function and does not care how a reply is produced. To use the real Gemini API:
+Public (browser, `VITE_*`):
 
-1. Move the call to a server function (do **not** put the API key in the browser).
-2. Inside the server handler, call Gemini:
-   ```ts
-   import { GoogleGenerativeAI } from "@google/generative-ai";
-   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-   const result = await model.generateContent(userMessage);
-   return result.response.text();
-   ```
-3. Have `sendMessageToGemini` call your server function. The UI stays the same.
+| Variable                       | Purpose                                |
+| ------------------------------ | -------------------------------------- |
+| `VITE_SUPABASE_URL`            | Supabase project URL                   |
+| `VITE_SUPABASE_PUBLISHABLE_KEY`| Supabase anon/publishable key          |
+| `VITE_SUPABASE_PROJECT_ID`     | Supabase project ref                   |
+| `VITE_CHAT_API_URL`            | Chat backend endpoint (Render)         |
 
-## Deployment
+Server (never expose): `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY` (backend only). See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**.
 
-This project is built on TanStack Start and runs on Lovable's hosted infrastructure. Click **Publish** in the Lovable editor to deploy. For other hosts (e.g. Vercel), follow TanStack Start's adapter docs and supply the same `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` environment variables.
+## Documentation
+
+- [Setup Guide](docs/SETUP.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [API Reference](docs/API.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Bug Fix Report](docs/BUGFIXES.md)
+- [Project Handover](docs/HANDOVER.md)
+- [Presentation](PRESENTATION.md)
+
+## License
+
+MIT
