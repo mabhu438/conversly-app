@@ -1,12 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ChatWindow } from "@/components/chat/ChatWindow";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+// Legacy thread URLs redirect to the single voice call screen.
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
-  component: ThreadPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/chat" });
+  },
 });
-
-function ThreadPage() {
-  const { threadId } = Route.useParams();
-  // key forces remount on thread change so state/messages don't bleed
-  return <ChatWindow key={threadId} threadId={threadId} />;
-}
